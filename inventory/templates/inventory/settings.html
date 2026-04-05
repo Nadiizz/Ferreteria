@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Configuración de Sistema{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Centro de Configuración y Despliegue</h1>
+        <p>Administración de directivas del ERP, integraciones y motores de base de datos.</p>
+    </div>
+
+    <!-- Tabs Menu (Visual Mockup) -->
+    <div style="display: flex; gap: 2rem; border-bottom: 1px solid var(--border-color); margin-top: 1.5rem; margin-bottom: 2rem; padding-bottom: 0.5rem;">
+        <a href="#" style="color: var(--accent-blue); border-bottom: 2px solid var(--accent-blue); padding-bottom: 0.5rem; text-decoration: none; font-weight: 600;">General</a>
+        <a href="#" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">Conexión a Datos</a>
+        <a href="#" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">Mail / SMTP</a>
+        <a href="#" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">Roles y Permisos</a>
+        <a href="#" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">API & Webhooks</a>
+    </div>
+
+    <div class="charts-grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+        
+        <!-- General Settings Block -->
+        <div class="content-section" style="margin-top: 0;">
+            <div class="section-header">
+                <h2>Variables de Negocio</h2>
+            </div>
+            <form style="display: grid; gap: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Razón Social de la Empresa</label>
+                    <input type="text" value="Ferreterías ACME Latinoamérica S.A." class="form-control" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Moneda Operativa</label>
+                        <select class="form-control" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                            <option>USD - Dólar Estadounidense</option>
+                            <option>EUR - Euro</option>
+                            <option>ARS - Peso Argentino</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Impuesto Predeterminado (%)</label>
+                        <input type="number" value="21" class="form-control" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Tema de Interfaz (Bloqueado por Política corporativa)</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem; padding: 0.8rem; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                        <label style="cursor: default; display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" checked disabled> <span>Dark Mode (Recomendado)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-primary" onclick="showToast('Ajustes generales actualizados con éxito.', 'success')" style="justify-self: start;">Guardar Preferencias</button>
+            </form>
+        </div>
+
+        <!-- Database Engine Config -->
+        <div class="content-section" style="margin-top: 0;">
+            <div class="section-header">
+                <h2>Configuración del Motor DB</h2>
+                <span class="status-badge" style="background: rgba(56, 189, 248, 0.2); color: var(--accent-blue);">Modo Local Activado</span>
+            </div>
+            
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                Actualmente el ERP está operando en la base de datos de de aislamiento / pruebas <strong>SQLite3</strong>. Para desplegar a producción conecte con el cluster MariaDB.
+            </p>
+
+            <form style="display: grid; gap: 1rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Motor de Base de Datos</label>
+                    <select class="form-control" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                        <option value="sqlite">SQLite (Desarrollo/Offline)</option>
+                        <option value="mariadb" disabled>MariaDB / MySQL (Producción Cluster) - Requiere edición manual</option>
+                        <option value="postgres" disabled>PostgreSQL (No soportado en esta versión)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Host del Servidor en Producción</label>
+                    <input type="text" value="10.0.0.150" disabled class="form-control" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-muted); cursor: not-allowed;">
+                </div>
+
+                <div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid var(--accent-yellow); padding: 1rem; border-radius: 4px; margin-top: 0.5rem;">
+                    <p style="margin: 0; font-size: 0.85rem; color: #fde047;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> <strong>Aviso para IT:</strong><br>
+                        La migración al nodo de MariaDB requiere editar el archivo <code>acme_erp/settings.py</code>, descomentando el bloque "CONFIGURACIÓN MARIADB" en la línea 81 y corriendo <code>python manage.py migrate</code>.
+                    </p>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

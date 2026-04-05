@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACME ERP | {% block title %}Gestión{% endblock %}</title>
+    <meta name="description" content="Sistema ERP para Ferretería ACME - Gestión de Insumos y Productos">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Toastify for modern notifications -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'inventory/styles.css' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+            <span>ACME ERP</span>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="{% url 'inventory:dashboard' %}" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'inventory:products' %}" class="nav-link {% if active_page == 'products' %}active{% endif %}">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>Insumos y Productos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'inventory:sales' %}" class="nav-link {% if active_page == 'sales' %}active{% endif %}">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Ventas y Órdenes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'inventory:suppliers' %}" class="nav-link {% if active_page == 'suppliers' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Proveedores</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'inventory:database' %}" class="nav-link {% if active_page == 'database' %}active{% endif %}">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Servidor BD (MariaDB)</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'inventory:security' %}" class="nav-link {% if active_page == 'security' %}active{% endif %}">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Seguridad & Access Control</span>
+                </a>
+            </li>
+            <li class="nav-item" style="margin-top: auto; padding-top: 2rem;">
+                <a href="{% url 'inventory:settings' %}" class="nav-link {% if active_page == 'settings' %}active{% endif %}">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Configuración</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Navigation Bar -->
+        <header class="topbar">
+            <!-- Solo mostramos el search form de backend o tenemos uno de JS -->
+            <!-- Vamos a usar JS para la tabla directamente, por lo que el topbar envia al listado global -->
+            <form class="search-bar" id="globalSearchBar" method="GET" action="{% url 'inventory:products' %}">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                <input type="text" id="searchInput" name="q" placeholder="Buscar en el sistema..." value="{{ query }}">
+            </form>
+
+            <div class="user-controls">
+                <button class="icon-btn" title="Notificaciones">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <div class="avatar" title="Ing. Ciberseguridad">
+                    AD
+                </div>
+            </div>
+        </header>
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <script>
+        // Set URLs logically for JS to consume
+        const API_SAVE_URL = "{% url 'inventory:api_save' %}";
+        const API_DELETE_URL = "{% url 'inventory:api_delete' 0 %}";
+    </script>
+    <script src="{% static 'inventory/script.js' %}"></script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

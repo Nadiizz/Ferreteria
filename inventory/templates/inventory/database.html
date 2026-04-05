@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Servidor MariaDB{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Centro de Datos On-Premise</h1>
+        <p>Monitorización en tiempo real del motor MariaDB (Actualmente corriendo en entorno Local de pruebas).</p>
+    </div>
+
+    <!-- DB Metrics -->
+    <div class="stats-grid">
+        <div class="stat-card" style="border: 1px solid var(--accent-green);">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-server"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Estado Motor</h3>
+                <div class="value" style="color: var(--accent-green); font-size: 1.1rem;">MariaDB 10.6 ONLINE</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-database"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Uso de Almacenamiento</h3>
+                <div class="value">42% <span style="font-size: 0.8rem; font-weight: normal;">(512GB libres)</span></div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon yellow">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Queries / Seg</h3>
+                <div class="value">145 QPS</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon red">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Hilos Conectados</h3>
+                <div class="value">23 Threads</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Real-time Console & Slow Queries -->
+    <div class="stats-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+        
+        <!-- Live Console Terminal style -->
+        <section class="content-section" style="margin-top: 0; background: var(--bg-secondary);">
+            <div class="section-header">
+                <h2>Consola de Mantenimiento SSH</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: var(--accent-red);"></span>
+                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: var(--accent-yellow);"></span>
+                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: var(--accent-green);"></span>
+                </div>
+            </div>
+            <div style="background-color: #0d1117; color: #58a6ff; padding: 1.5rem; font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid #30363d; height: 320px; overflow-y: auto;">
+                <span style="color: #484f58;">[root@mariadb-master-01 ~]#</span> systemctl status mariadb<br>
+                <span style="color: #3fb950;">● mariadb.service - MariaDB 10.6.12 database server</span><br>
+                &nbsp;&nbsp;&nbsp;Loaded: loaded (/lib/systemd/system/mariadb.service; enabled; vendor preset: enabled)<br>
+                &nbsp;&nbsp;&nbsp;Active: <span style="color: #3fb950;">active (running)</span> since Thu 2026-04-02 00:00:00 UTC; 3 days ago<br>
+                &nbsp;Main PID: 1210 (mysqld)<br>
+                &nbsp;&nbsp;&nbsp;Status: "Taking your SQL requests now..."<br>
+                <br>
+                <span style="color: #484f58;">[root@mariadb-master-01 ~]#</span> mysqladmin status<br>
+                Uptime: 284025  Threads: 23  Questions: 4115822  Slow queries: 13  Opens: 512  Flush tables: 3  Open tables: 400  Queries per second avg: 14.491<br>
+                <br>
+                <span style="color: #484f58;">[root@mariadb-master-01 ~]#</span> tail -f /var/log/mysql/mariadb-error.log<br>
+                <span style="color: #8b949e;">[Note] InnoDB: Buffer pool(s) load completed at 260402  0:00:15</span><br>
+                <span style="color: #8b949e;">[Note] Server socket created on IP: '10.0.0.150'.</span><br>
+                <span style="animation: blink 1s step-end infinite; display: inline-block; width: 8px; height: 15px; background: #58a6ff; margin-left: 2px;"></span>
+            </div>
+        </section>
+
+        <!-- Slow Queries Table -->
+        <section class="content-section" style="margin-top: 0;">
+            <div class="section-header">
+                <h2>Slow Query Log (Top)</h2>
+                <button class="btn-primary" style="background-color: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+                    <i class="fa-solid fa-download"></i> Exportar
+                </button>
+            </div>
+            <div class="table-container" style="max-height: 320px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tiempo (s)</th>
+                            <th>Consulta SQL</th>
+                            <th>Base de Datos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="color: var(--accent-red);">4.12</strong></td>
+                            <td style="font-family: monospace; font-size: 0.85rem; color: #a5b4fc;">SELECT * FROM invoice_lines LEFT JOIN...</td>
+                            <td>acme_erp_db</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--accent-yellow);">2.85</strong></td>
+                            <td style="font-family: monospace; font-size: 0.85rem; color: #a5b4fc;">UPDATE inventory_product SET stock =...</td>
+                            <td>acme_erp_db</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--accent-yellow);">1.90</strong></td>
+                            <td style="font-family: monospace; font-size: 0.85rem; color: #a5b4fc;">SELECT SUM(total) FROM sales_order WH...</td>
+                            <td>acme_erp_db</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--text-muted);">0.95</strong></td>
+                            <td style="font-family: monospace; font-size: 0.85rem; color: #a5b4fc;">SELECT COUNT(*) FROM auth_user WHERE...</td>
+                            <td>acme_erp_db</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</div>
+<style>
+    @keyframes blink { 50% { opacity: 0; } }
+</style>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Panel de Control On-Premise</h1>
+        <p>Resumen general de insumos, infraestructura dedicada e inventario actual de la cadena.</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Total Insumos</h3>
+                <div class="value">{{ total_products }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon yellow">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Alertas de Stock</h3>
+                <div class="value">{{ alert_count }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-server"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Estado DB MySQL</h3>
+                <div class="value" style="font-size: 1rem; font-weight: 500;">En línea & Sincronizada</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon red">
+                <i class="fa-solid fa-fire-burner"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Bloqueos de Firewall</h3>
+                <div class="value">12 Eventos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+        <div class="content-section" style="margin-top: 0;">
+            <div class="section-header">
+                <h2>Movimientos de Stock Mensuales</h2>
+            </div>
+            <div style="position: relative; height:300px; width:100%;">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="content-section" style="margin-top: 0;">
+            <div class="section-header">
+                <h2>Distribución por Categorías</h2>
+            </div>
+            <div style="position: relative; height:300px; width:100%;">
+                <canvas id="doughnutChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ sales_labels|json_script:"sales-labels" }}
+{{ sales_ingresos_data|json_script:"sales-ingresos" }}
+{{ sales_salidas_data|json_script:"sales-salidas" }}
+{{ category_labels|json_script:"category-labels" }}
+{{ category_data|json_script:"category-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart Defaults for Dark Mode
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+
+    // Retrieve cleanly serialized data for Bar Chart
+    const salesLabels = JSON.parse(document.getElementById('sales-labels').textContent);
+    const salesIngresos = JSON.parse(document.getElementById('sales-ingresos').textContent);
+    const salesSalidas = JSON.parse(document.getElementById('sales-salidas').textContent);
+
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: salesLabels,
+            datasets: [{
+                label: 'Ingresos',
+                data: salesIngresos,
+                backgroundColor: 'rgba(56, 189, 248, 0.7)',
+                borderRadius: 4
+            }, {
+                label: 'Salidas (Op. Extrapolada)',
+                data: salesSalidas,
+                backgroundColor: 'rgba(244, 63, 94, 0.7)',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Retrieve cleanly serialized data for Doughnut Chart
+    const categoryLabels = JSON.parse(document.getElementById('category-labels').textContent);
+    const categoryData = JSON.parse(document.getElementById('category-data').textContent);
+
+    const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+    new Chart(ctxDoughnut, {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryData,
+                backgroundColor: [
+                    'rgba(56, 189, 248, 0.8)',
+                    'rgba(167, 139, 250, 0.8)',
+                    'rgba(250, 204, 21, 0.8)',
+                    'rgba(52, 211, 153, 0.8)',
+                    'rgba(148, 163, 184, 0.8)',
+                    'rgba(236, 72, 153, 0.8)',
+                    'rgba(249, 115, 22, 0.8)'
+                ],
+                borderWidth: 0,
+                cutout: '70%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right' }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

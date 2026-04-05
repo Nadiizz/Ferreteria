@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Proveedores{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Gestión de Proveedores</h1>
+        <p>Directorio maestro de proveedores y estatus de cuentas por pagar.</p>
+    </div>
+
+    <section class="content-section" style="margin-top: 1rem;">
+        <div class="section-header">
+            <h2>Directorio Activo</h2>
+            <button class="btn-primary">
+                <i class="fa-solid fa-building"></i> Añadir Proveedor
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>RUT/NIT</th>
+                        <th>Razón Social</th>
+                        <th>Contacto Principal</th>
+                        <th>Categoría Suministro</th>
+                        <th>Rating</th>
+                        <th>Estado Cuenta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                    <tr>
+                        <td><strong>{{ supplier.tax_id }}</strong></td>
+                        <td>{{ supplier.name }}</td>
+                        <td>{{ supplier.contact }}</td>
+                        <td>{{ supplier.category }}</td>
+                        <td>
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= supplier.rating %}
+                                    <i class="fa-solid fa-star" style="color: gold;"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star" style="color: gray;"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <span class="status-badge {% if 'deuda' in supplier.account_status|lower %}low-stock{% else %}in-stock{% endif %}">
+                                {{ supplier.account_status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">No hay proveedores registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

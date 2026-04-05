@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Ventas y Órdenes{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Ventas y Órdenes Temporales</h1>
+        <p>Monitor de transacciones de caja y facturación electrónica B2B en tiempo real.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-money-bill-trend-up"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Ventas Hoy</h3>
+                <div class="value">$14,520</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Facturas Emitidas</h3>
+                <div class="value">42</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon yellow">
+                <i class="fa-regular fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Órdenes Pendientes</h3>
+                <div class="value">3</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content-section">
+        <div class="section-header">
+            <h2>Últimas Transacciones (Simuladas)</h2>
+            <button class="btn-primary">
+                <i class="fa-solid fa-cash-register"></i> Nueva Venta
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nº Orden</th>
+                        <th>Cliente</th>
+                        <th>Método Pago</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td><strong>{{ sale.order_number }}</strong></td>
+                        <td>{{ sale.customer.name|default:"Mostrador" }}</td>
+                        <td>{{ sale.payment_method }}</td>
+                        <td><strong>${{ sale.total }}</strong></td>
+                        <td>{{ sale.date|timesince }} ago</td>
+                        <td>
+                            <span class="status-badge {% if sale.status == 'completed' %}in-stock{% elif sale.status == 'pending' %}low-stock{% else %}out-stock{% endif %}">
+                                {{ sale.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">No hay ventas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
